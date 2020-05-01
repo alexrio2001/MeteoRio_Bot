@@ -1,0 +1,23 @@
+{
+  "name": "MeteoRio_Bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alexrio2001/MeteoRio_Bot.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alexrio2001/MeteoRio_Bot/issues"
+  },
+  "homepage": "https://github.com/alexrio2001/MeteoRio_Bot#readme",
+  "dependencies": {
+    "http": "0.0.1-security"
+  }
+}
