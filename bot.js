@@ -67,3 +67,28 @@ bot.onText(/\/oggi (.+)/, (msg, match) => {
         bot.sendMessage(chat_id, "Si è verificato un errore!\n" + error.message);
     });
 });
+
+bot.onText(/\/oggi (.+)/, (msg, match) => {
+    const chat_id = msg.chat.id;
+    const citta = match[1] ? match[1] : "";
+    http.get('http://api.openweathermap.org/data/2.5/weather?q=' + citta + '&appid=' + apimeteo, (res) => {
+        let rawDat = '';
+        res.on('data', (chunk) => { rawDat += chunk; });
+        res.on('end', () => {
+            try {
+                const DatiConvertiti = JSON.parse(rawDat);
+                var messaggi = [];
+                DatiConvertiti.weather.forEach(function (value) {
+                    messaggi.push("Meteo: " + value.description);
+                });
+                messaggi.push("Temperatura: " + DatiConvertiti.main.temp + "°C");
+                messaggi.push("Vento: " + DatiConvertiti.wind.speed + "m/s");
+                bot.sendMessage(chat_id, messaggi.join("\n"));
+            } catch (error) {
+                bot.sendMessage(chat_id, "Si è verificato un errore!\n" + error.message);
+            }
+        })
+    }).on('error', (error) => {
+        bot.sendMessage(chat_id, "Si è verificato un errore!\n" + error.message);
+    });
+});
