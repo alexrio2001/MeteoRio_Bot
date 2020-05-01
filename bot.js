@@ -1,5 +1,6 @@
 const TelegramBot = require('node-telegram-bot-api');
 const http = require('http');
+const fs=require('fs');
 
 const token = '1295480116:AAHxAoXlJ7Y2jBpnLhntJILZj9aikSA9tH4';
 const apimeteo = '397d1e8e58e381cc82d95209911bd4db';
@@ -68,22 +69,23 @@ bot.onText(/\/oggi (.+)/, (msg, match) => {
     });
 });
 
-bot.onText(/\/oggi (.+)/, (msg, match) => {
+bot.onText(/\/domani (.+)/, (msg, match) => {
     const chat_id = msg.chat.id;
     const citta = match[1] ? match[1] : "";
-    http.get('http://api.openweathermap.org/data/2.5/weather?q=' + citta + '&appid=' + apimeteo, (res) => {
+    http.get('api.openweathermap.org/data/2.5/forecast?q=' + citta + '&cnt=2&appid=' + apimeteo, (res) => {
         let rawDat = '';
         res.on('data', (chunk) => { rawDat += chunk; });
         res.on('end', () => {
             try {
                 const DatiConvertiti = JSON.parse(rawDat);
+fs.writeFileSync("datimeteo.json", DatiConvertiti);/*
                 var messaggi = [];
                 DatiConvertiti.weather.forEach(function (value) {
                     messaggi.push("Meteo: " + value.description);
                 });
                 messaggi.push("Temperatura: " + DatiConvertiti.main.temp + "°C");
                 messaggi.push("Vento: " + DatiConvertiti.wind.speed + "m/s");
-                bot.sendMessage(chat_id, messaggi.join("\n"));
+                bot.sendMessage(chat_id, messaggi.join("\n"));*/
             } catch (error) {
                 bot.sendMessage(chat_id, "Si è verificato un errore!\n" + error.message);
             }
