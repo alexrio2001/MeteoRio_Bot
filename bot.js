@@ -1,6 +1,6 @@
 const TelegramBot = require('node-telegram-bot-api');
 const http = require('http');
-const fs=require('fs');
+const fs = require('fs');
 
 const token = '1295480116:AAHxAoXlJ7Y2jBpnLhntJILZj9aikSA9tH4';
 const apimeteo = '397d1e8e58e381cc82d95209911bd4db';
@@ -78,7 +78,7 @@ bot.onText(/\/domani (.+)/, (msg, match) => {
         res.on('end', () => {
             try {
                 const DatiConvertiti = JSON.parse(rawDat);
-fs.writeFileSync("datimeteo.json", DatiConvertiti);/*
+                fs.writeFileSync("datimeteo.json", DatiConvertiti);/*
                 var messaggi = [];
                 DatiConvertiti.weather.forEach(function (value) {
                     messaggi.push("Meteo: " + value.description);
