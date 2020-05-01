@@ -34,7 +34,7 @@ bot.onText(/\/start/, (msg) => {
         let text;
 
         if (action === '1') {
-            text = "Elenco dei comandi disponibili:\n. Previsioni meteo per oggi in una citta' => /oggi nomecitta'\n. Previsioni meteo domani in una citta' => /domani nomecitta'\n. Previsioni meteo prossimi giorni inserendo un numero da 2 a 16 => /prossimo nomecitta numerogiorno";
+            text = "Elenco dei comandi disponibili:\n. Previsioni meteo per oggi in una citta' => /oggi nomecitta'\n. Previsioni meteo per i prossimi 5 giorni ogni 3 ore in una citta' => /prossimigiorni nomecitta'";
         }
         if (action === '2') {
             text = "MeteoRio_bot, bot creato da Rio Alex per progetto di fine anno di TPSIT, GPOI e SISTEMI";
@@ -69,10 +69,11 @@ bot.onText(/\/oggi (.+)/, (msg, match) => {
     });
 });
 
-bot.onText(/\/domani (.+)/, (msg, match) => {
+
+bot.onText(/\/prossimi (.+)/, (msg, match) => {
     const chat_id = msg.chat.id;
     const citta = match[1] ? match[1] : "";
-    http.get('api.openweathermap.org/data/2.5/forecast?q=' + citta + '&cnt=2&appid=' + apimeteo, (res) => {
+    http.get('http://api.openweathermap.org/data/2.5/forecast?q=' + citta + '&appid=' + apimeteo, (res) => {
         let rawDat = '';
         res.on('data', (chunk) => { rawDat += chunk; });
         res.on('end', () => {
@@ -86,6 +87,7 @@ bot.onText(/\/domani (.+)/, (msg, match) => {
                 messaggi.push("Temperatura: " + DatiConvertiti.main.temp + "°C");
                 messaggi.push("Vento: " + DatiConvertiti.wind.speed + "m/s");
                 bot.sendMessage(chat_id, messaggi.join("\n"));*/
+                bot.sendMessage(chat_id, "File JSON creato");
             } catch (error) {
                 bot.sendMessage(chat_id, "Si è verificato un errore!\n" + error.message);
             }
