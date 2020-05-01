@@ -1,0 +1,1 @@
+api.openweathermap.org/data/2.5/forecast/daily?q={city name}&cnt={cnt}&appid=397d1e8e58e381cc82d95209911bd4db
