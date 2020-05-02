@@ -9,6 +9,7 @@ const bot = new TelegramBot(token,
         polling: true
     });
 
+//comando benvenuto
 bot.onText(/\/start/, (msg) => {
     var benvenuto = "Benvenuto nel bot MeteoRio";
 
@@ -36,13 +37,17 @@ bot.onText(/\/start/, (msg) => {
             text = "Elenco dei comandi disponibili:\n. Previsioni meteo per oggi in una citta' => /oggi nomecitta'\n. Previsioni meteo domani in una citta' => /domani nomecitta'\n. Previsioni meteo dopodomani => /dopodomani nomecitta\n. Previsioni meteo prossimi 5 giorni => /prossimi nomecitta";
         }
         if (action === '2') {
-            text = "MeteoRio_bot, bot creato da Rio Alex per progetto di fine anno di TPSIT, GPOI e SISTEMI";
+            text = "MeteoRio_bot, bot creato da Rio Alex per progetto di fine anno di TPSIT e GPOI";
         }
 
         bot.sendMessage(msg.chat.id, text, opts);
     });
 });
 
+
+bot.on("polling_error", (err) => console.log(err));
+
+//comando meteo oggi
 bot.onText(/\/oggi (.+)/, (msg, match) => {
     const chat_id = msg.chat.id;
     const citta = match[1] ? match[1] : "";
@@ -68,6 +73,7 @@ bot.onText(/\/oggi (.+)/, (msg, match) => {
     });
 });
 
+//comando meteo domani
 bot.onText(/\/domani (.+)/, (msg, match) => {
     const chat_id = msg.chat.id;
     const citta = match[1] ? match[1] : "";
@@ -101,6 +107,7 @@ bot.onText(/\/domani (.+)/, (msg, match) => {
     });
 });
 
+//comando meteo dopodomani
 bot.onText(/\/dopodomani (.+)/, (msg, match) => {
     const chat_id = msg.chat.id;
     const citta = match[1] ? match[1] : "";
@@ -133,6 +140,7 @@ bot.onText(/\/dopodomani (.+)/, (msg, match) => {
     });
 });
 
+//comando meteo prossimi 5 giorni
 bot.onText(/\/prossimi (.+)/, (msg, match) => {
     const chat_id = msg.chat.id;
     const citta = match[1] ? match[1] : "";
@@ -157,7 +165,7 @@ bot.onText(/\/prossimi (.+)/, (msg, match) => {
                 var hour = data.substr(11, 5);
                 var d = data.substr(0, 10);
 
-                if ((d != oggi && j % 8 == 0) || (d != oggi &&j == 0)) {
+                if ((d != oggi && j % 8 == 0) || (d != oggi && j == 0)) {
                     var string = "Day: " + d + "\nAt: " + hour + "\nGeneral info: " + generale + " \nDetails: " + descrizione + "\n\n";
                     dati.push(string);
                     j++;
@@ -176,6 +184,8 @@ bot.onText(/\/prossimi (.+)/, (msg, match) => {
     });
 });
 
+
+//funzioni per calcolare le date
 function calcolaDomani() {
     var giorno = "";
     var date = new Date();
