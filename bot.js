@@ -193,7 +193,7 @@ bot.onText(/\/prossimi (.+)/, (msg, match) => {
                     j++;
                 }
             }
-            fs.writeFileSync("nexttomorrow.json", dati);
+            fs.writeFileSync("next.json", dati);
             bot.sendMessage(chat_id, dati.join("\n"));
         });
     }).on('error', (error) => {
