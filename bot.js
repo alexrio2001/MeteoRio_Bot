@@ -18,7 +18,8 @@ bot.onText(/\/start/, (msg) => {
         reply_markup: JSON.stringify({
             inline_keyboard: [
                 [{ text: "Lista Comandi", callback_data: "1" }],
-                [{ text: "Info bot", callback_data: "2" }]
+                [{ text: "Info bot", callback_data: "2" }],
+                [{ text: "Documentazione", callback_data: "3" }]
             ]
         })
 
@@ -39,7 +40,10 @@ bot.onText(/\/start/, (msg) => {
         if (action === '2') {
             text = "MeteoRio_bot, bot creato da Rio Alex per progetto di fine anno di TPSIT e GPOI";
         }
-
+        if (action === '3') {
+            text ="Recupero Documentazione...";
+            bot.sendDocument(msg.chat.id, "https://drive.google.com/file/d/1PaX_9CaCfgmyd0aQEjWkAGs-c-j5DSIb/view?usp=sharing");
+        }
         bot.sendMessage(msg.chat.id, text, opts);
     });
 });
@@ -88,19 +92,20 @@ bot.onText(/\/domani (.+)/, (msg, match) => {
             let obj = JSON.parse(output);
             var dati = [];
             var domani = calcolaDomani();
+            domani = parseInt(domani, 10);
             for (var i = 0; i < 40; i++) {
                 var generale = obj.list[i].weather[0].main;
                 var descrizione = obj.list[i].weather[0].description;
-                var data_oggi = obj.list[0].dt_txt;
-                var hour = data_oggi.substr(11, 5);
-                if (data_oggi[8] == domani[0] && data_oggi[9] == domani[1]) {
-
+                var date = obj.list[i].dt_txt;
+                var hour = date.substr(11, 5);
+                var day = date.substr(8, 2);
+                day = parseInt(day, 10);
+                if (domani == day) {
                     var string = "At: " + hour + "\nGeneral info: " + generale + " \nDetails: " + descrizione + "\n\n";
                     dati.push(string);
                 }
             }
             bot.sendMessage(chat_id, dati.join("\n"));
-            console.log(domani)
         });
     }).on('error', (error) => {
         bot.sendMessage(chat_id, "Si è verificato un errore!\n" + error.message);
@@ -126,12 +131,11 @@ bot.onText(/\/dopodomani (.+)/, (msg, match) => {
             for (var i = 0; i < 40; i++) {
                 var generale = obj.list[i].weather[0].main;
                 var descrizione = obj.list[i].weather[0].description;
-                var date =  obj.list[i].dt_txt;
+                var date = obj.list[i].dt_txt;
                 var hour = date.substr(11, 5);
                 var day = date.substr(8, 2);
                 day = parseInt(day, 10);
                 if (dopodomani == day) {
-
                     var string = "At: " + hour + "\nGeneral info: " + generale + " \nDetails: " + descrizione + "\n\n";
                     dati.push(string);
                 }
