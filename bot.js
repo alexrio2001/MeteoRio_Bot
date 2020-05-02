@@ -12,19 +12,19 @@ const bot = new TelegramBot(token,
 
 //comando benvenuto
 bot.onText(/\/start/, (msg) => {
-    var benvenuto = "Benvenuto nel bot MeteoRio";
+    var benvenuto = "Welcome into the bot MeteoRio";
 
     bot.sendMessage(msg.chat.id, benvenuto);
     var options = {
         reply_markup: JSON.stringify({
             inline_keyboard: [
-                [{ text: "Lista Comandi", callback_data: "1" }],
+                [{ text: "Commands", callback_data: "1" }],
                 [{ text: "Info bot", callback_data: "2" }],
             ]
         })
 
     };
-    bot.sendMessage(msg.chat.id, "Seleziona una voce", options);
+    bot.sendMessage(msg.chat.id, "Select an item", options);
     bot.on('callback_query', function onCallbackQuery(callbackQuery) {
         const action = callbackQuery.data;
         const msg = callbackQuery.message;
@@ -35,7 +35,7 @@ bot.onText(/\/start/, (msg) => {
         let text;
 
         if (action === '1') {
-            text = "Elenco dei comandi disponibili:\n. Previsioni meteo per oggi in una citta' => /oggi nomecitta'\n. Previsioni meteo domani in una citta' => /domani nomecitta'\n. Previsioni meteo dopodomani => /dopodomani nomecitta\n. Previsioni meteo prossimi 5 giorni => /prossimi nomecitta";
+            text = "List of available commands:\n. Weather forecast for today in a city => /today cityname\n. Weather forecast tomorrow in a city => /tomorrow cityname\n. Weather forecast the day after tomorrow => /after cityname\n. Weather forecast next 5 days => /next cityname";
         }
         if (action === '2') {
             text = "MeteoRio_bot, bot creato da Rio Alex per progetto di fine anno di TPSIT e GPOI";
@@ -48,7 +48,7 @@ bot.onText(/\/start/, (msg) => {
 bot.on("polling_error", (err) => console.log(err));
 
 //comando meteo oggi
-bot.onText(/\/oggi (.+)/, (msg, match) => {
+bot.onText(/\/today (.+)/, (msg, match) => {
     const chat_id = msg.chat.id;
     const citta = match[1] ? match[1] : "";
     bot.sendMessage(chat_id, "Weather for today in " + citta);
@@ -58,28 +58,30 @@ bot.onText(/\/oggi (.+)/, (msg, match) => {
         res.on('end', () => {
             try {
                 const DatiConvertiti = JSON.parse(rawDat);
-                var messaggi = [];
+                var dati = [];
                 DatiConvertiti.weather.forEach(function (value) {
-                    messaggi.push("Weather: " + value.description);
+                    dati.push("Weather: " + value.description);
                 });
-                messaggi.push("Tempe: " + DatiConvertiti.main.temp + "°C");
-                messaggi.push("Wind: " + DatiConvertiti.wind.speed + "m/s");
-                fs.writeFileSync("today.json", messaggi);
-                bot.sendMessage(chat_id, messaggi.join("\n"));
+                dati.push("Temperature: " + DatiConvertiti.main.temp + "°C");
+                dati.push("Wind: " + DatiConvertiti.wind.speed + "m/s");
+
+                bot.sendMessage(chat_id, dati.join("\n"));
+                dati = JSON.stringify(dati);
+                fs.writeFileSync("today.json", dati);
             } catch (error) {
-                bot.sendMessage(chat_id, "Si è verificato un errore!\n" + error.message);
+                bot.sendMessage(chat_id, "There is an error!\n" + error.message);
             }
         })
     }).on('error', (error) => {
-        bot.sendMessage(chat_id, "Si è verificato un errore!\n" + error.message);
+        bot.sendMessage(chat_id, "There is an error!\n" + error.message);
     });
 });
 
 //comando meteo domani
-bot.onText(/\/domani (.+)/, (msg, match) => {
+bot.onText(/\/tomorrow (.+)/, (msg, match) => {
     const chat_id = msg.chat.id;
     const citta = match[1] ? match[1] : "";
-    bot.sendMessage(chat_id, "Weather for day after tomorrow in " + citta);
+    bot.sendMessage(chat_id, "Weather for tomorrow in " + citta);
     http.get('http://api.openweathermap.org/data/2.5/forecast?q=' + citta + '&appid=' + apimeteo, (res) => {
         let output = '';
         res.on('data', (chunk) => {
@@ -102,20 +104,21 @@ bot.onText(/\/domani (.+)/, (msg, match) => {
                 var day = date.substr(8, 2);
                 day = parseInt(day, 10);
                 if (domani == day) {
-                    var string = "At: " + hour + "\nGeneral info: " + generale + " \nDetails: " + descrizione + "\n Minimum temperature: " + min + "\n Maximum temperature: " + max + " \nWind: " + vento + "\n\n";
+                    var string = "At: " + hour + "\nGeneral info: " + generale + " \nDetails: " + descrizione + "\nMinimum temperature: " + min + "°C" + "\nMaximum temperature: " + max + "°C" + " \nWind: " + vento + "m/s" + "\n\n";
                     dati.push(string);
                 }
             }
-            fs.writeFileSync("tomorrow.json", dati);
             bot.sendMessage(chat_id, dati.join("\n"));
+            dati = JSON.stringify(dati);
+            fs.writeFileSync("tomorrow.json", dati);
         });
     }).on('error', (error) => {
-        bot.sendMessage(chat_id, "Si è verificato un errore!\n" + error.message);
+        bot.sendMessage(chat_id, "There is an error!\n" + error.message);
     });
 });
 
 //comando meteo dopodomani
-bot.onText(/\/dopodomani (.+)/, (msg, match) => {
+bot.onText(/\/after (.+)/, (msg, match) => {
     const chat_id = msg.chat.id;
     const citta = match[1] ? match[1] : "";
     bot.sendMessage(chat_id, "Weather for the day after tomorrow in " + citta);
@@ -141,20 +144,21 @@ bot.onText(/\/dopodomani (.+)/, (msg, match) => {
                 var day = date.substr(8, 2);
                 day = parseInt(day, 10);
                 if (dopodomani == day) {
-                    var string = "At: " + hour + "\nGeneral info: " + generale + " \nDetails: " + descrizione + "\n Minimum temperature: " + min + "\n Maximum temperature: " + max + " \nWind: " + vento + "\n\n";
+                    var string = "At: " + hour + "\nGeneral info: " + generale + " \nDetails: " + descrizione + "\nMinimum temperature: " + min + "°C" + "\nMaximum temperature: " + max + "°C" + " \nWind: " + vento + "m/s" + "\n\n";
                     dati.push(string);
                 }
             }
-            fs.writeFileSync("nexttomorrow.json", dati);
             bot.sendMessage(chat_id, dati.join("\n"));
+            dati = JSON.stringify(dati);
+            fs.writeFileSync("nexttomorrow.json", dati);
         });
     }).on('error', (error) => {
-        bot.sendMessage(chat_id, "Si è verificato un errore!\n" + error.message);
+        bot.sendMessage(chat_id, "There is an error!\n" + error.message);
     });
 });
 
 //comando meteo prossimi 5 giorni
-bot.onText(/\/prossimi (.+)/, (msg, match) => {
+bot.onText(/\/next (.+)/, (msg, match) => {
     const chat_id = msg.chat.id;
     const citta = match[1] ? match[1] : "";
     bot.sendMessage(chat_id, "Weather for the next 5 days in " + citta);
@@ -166,10 +170,10 @@ bot.onText(/\/prossimi (.+)/, (msg, match) => {
 
         res.on('end', () => {
             let obj = JSON.parse(output);
-            var dati = [];
+            var dati;
+            var dati_completi = [];
             var oggi = calcolaData();
             var j = 0;
-            var primo = true;
             for (var i = 0; i < 40; i++) {
                 var generale = obj.list[i].weather[0].main;
                 var descrizione = obj.list[i].weather[0].description;
@@ -177,27 +181,35 @@ bot.onText(/\/prossimi (.+)/, (msg, match) => {
                 var max = obj.list[i].main.temp_max;
                 var vento = obj.list[i].wind.speed;
                 var data = obj.list[i].dt_txt;
-                console.log(data);
                 var hour = data.substr(11, 5);
                 var d = data.substr(0, 10);
 
-                if ((d != oggi && j % 8 == 0) || (d != oggi && j == 0)) {
-                    var string = "Day: " + d + "\nAt: " + hour + "\nGeneral info: " + generale + " \nDetails: " + descrizione + "\n Minimum temperature: " + min + "\n Maximum temperature: " + max + " \nWind: " + vento + "\n\n";
+                if ((d != oggi && j == 0) || (d != oggi && j % 8 == 0)) {
+                    dati = [];
+                    var string = "Day: " + d + "\nAt: " + hour + "\nGeneral info: " + generale + " \nDetails: " + descrizione + "\nMinimum temperature: " + min + "°C" + "\nMaximum temperature: " + max + "°C" + " \nWind: " + vento + "m/s" + "\n\n";
                     dati.push(string);
+                    dati_completi.push(string);
                     j++;
-                    primo == false;
                 }
-                else if (d != oggi && j % 8 != 0) {
-                    var string = "At: " + hour + "\nGeneral info: " + generale + " \nDetails: " + descrizione + "\n Minimum temperature: " + min + "\n Maximum temperature: " + max + " \nWind: " + vento + "\n\n"; var string = "At: " + hour + "\nGeneral info: " + generale + " \nDetails: " + descrizione + "\n\n";
+                else if (d != oggi && j % 8 != 0 && j % 8 != 7) {
+                    var string = "At: " + hour + "\nGeneral info: " + generale + " \nDetails: " + descrizione + "\nMinimum temperature: " + min + "°C" + "\nMaximum temperature: " + max + "°C" + " \nWind: " + vento + "m/s" + "\n\n";
+                    dati.push(string);
+                    dati_completi.push(string);
+                    j++;
+                }
+                else if (d != oggi && j % 8 == 7) {
+                    var string = "At: " + hour + "\nGeneral info: " + generale + " \nDetails: " + descrizione + "\nMinimum temperature: " + min + "°C" + "\nMaximum temperature: " + max + "°C" + " \nWind: " + vento + "m/s" + "\n\n";
                     dati.push(string);
                     j++;
+                    bot.sendMessage(chat_id, dati.join("\n"));
+                    dati_completi.push(string);
                 }
             }
-            fs.writeFileSync("next.json", dati);
-            bot.sendMessage(chat_id, dati.join("\n"));
+            dati_completi = JSON.stringify(dati_completi);
+            fs.writeFileSync("next.json", dati_completi);
         });
     }).on('error', (error) => {
-        bot.sendMessage(chat_id, "Si è verificato un errore!\n" + error.message);
+        bot.sendMessage(chat_id, "There is an error!\n" + error.message);
     });
 });
 
