@@ -1,5 +1,6 @@
 const TelegramBot = require('node-telegram-bot-api');
 const http = require('http');
+const fs = require('fs');
 
 const token = '1295480116:AAHxAoXlJ7Y2jBpnLhntJILZj9aikSA9tH4';
 const apimeteo = '397d1e8e58e381cc82d95209911bd4db';
@@ -50,6 +51,7 @@ bot.on("polling_error", (err) => console.log(err));
 bot.onText(/\/oggi (.+)/, (msg, match) => {
     const chat_id = msg.chat.id;
     const citta = match[1] ? match[1] : "";
+    bot.sendMessage(chat_id, "Weather for today in " + citta);
     http.get('http://api.openweathermap.org/data/2.5/weather?q=' + citta + '&appid=' + apimeteo, (res) => {
         let rawDat = '';
         res.on('data', (chunk) => { rawDat += chunk; });
@@ -58,10 +60,11 @@ bot.onText(/\/oggi (.+)/, (msg, match) => {
                 const DatiConvertiti = JSON.parse(rawDat);
                 var messaggi = [];
                 DatiConvertiti.weather.forEach(function (value) {
-                    messaggi.push("Meteo: " + value.description);
+                    messaggi.push("Weather: " + value.description);
                 });
-                messaggi.push("Temperatura: " + DatiConvertiti.main.temp + "°C");
-                messaggi.push("Vento: " + DatiConvertiti.wind.speed + "m/s");
+                messaggi.push("Tempe: " + DatiConvertiti.main.temp + "°C");
+                messaggi.push("Wind: " + DatiConvertiti.wind.speed + "m/s");
+                fs.writeFileSync("today.json", messaggi);
                 bot.sendMessage(chat_id, messaggi.join("\n"));
             } catch (error) {
                 bot.sendMessage(chat_id, "Si è verificato un errore!\n" + error.message);
@@ -91,15 +94,19 @@ bot.onText(/\/domani (.+)/, (msg, match) => {
             for (var i = 0; i < 40; i++) {
                 var generale = obj.list[i].weather[0].main;
                 var descrizione = obj.list[i].weather[0].description;
+                var min = obj.list[i].main.temp_min;
+                var max = obj.list[i].main.temp_max;
+                var vento = obj.list[i].wind.speed;
                 var date = obj.list[i].dt_txt;
                 var hour = date.substr(11, 5);
                 var day = date.substr(8, 2);
                 day = parseInt(day, 10);
                 if (domani == day) {
-                    var string = "At: " + hour + "\nGeneral info: " + generale + " \nDetails: " + descrizione + "\n\n";
+                    var string = "At: " + hour + "\nGeneral info: " + generale + " \nDetails: " + descrizione + "\n Minimum temperature: " + min + "\n Maximum temperature: " + max + " \nWind: " + vento + "\n\n";
                     dati.push(string);
                 }
             }
+            fs.writeFileSync("tomorrow.json", dati);
             bot.sendMessage(chat_id, dati.join("\n"));
         });
     }).on('error', (error) => {
@@ -126,15 +133,19 @@ bot.onText(/\/dopodomani (.+)/, (msg, match) => {
             for (var i = 0; i < 40; i++) {
                 var generale = obj.list[i].weather[0].main;
                 var descrizione = obj.list[i].weather[0].description;
+                var min = obj.list[i].main.temp_min;
+                var max = obj.list[i].main.temp_max;
+                var vento = obj.list[i].wind.speed;
                 var date = obj.list[i].dt_txt;
                 var hour = date.substr(11, 5);
                 var day = date.substr(8, 2);
                 day = parseInt(day, 10);
                 if (dopodomani == day) {
-                    var string = "At: " + hour + "\nGeneral info: " + generale + " \nDetails: " + descrizione + "\n\n";
+                    var string = "At: " + hour + "\nGeneral info: " + generale + " \nDetails: " + descrizione + "\n Minimum temperature: " + min + "\n Maximum temperature: " + max + " \nWind: " + vento + "\n\n";
                     dati.push(string);
                 }
             }
+            fs.writeFileSync("nexttomorrow.json", dati);
             bot.sendMessage(chat_id, dati.join("\n"));
         });
     }).on('error', (error) => {
@@ -162,23 +173,27 @@ bot.onText(/\/prossimi (.+)/, (msg, match) => {
             for (var i = 0; i < 40; i++) {
                 var generale = obj.list[i].weather[0].main;
                 var descrizione = obj.list[i].weather[0].description;
+                var min = obj.list[i].main.temp_min;
+                var max = obj.list[i].main.temp_max;
+                var vento = obj.list[i].wind.speed;
                 var data = obj.list[i].dt_txt;
                 console.log(data);
                 var hour = data.substr(11, 5);
                 var d = data.substr(0, 10);
 
                 if ((d != oggi && j % 8 == 0) || (d != oggi && j == 0)) {
-                    var string = "Day: " + d + "\nAt: " + hour + "\nGeneral info: " + generale + " \nDetails: " + descrizione + "\n\n";
+                    var string = "Day: " + d + "\nAt: " + hour + "\nGeneral info: " + generale + " \nDetails: " + descrizione + "\n Minimum temperature: " + min + "\n Maximum temperature: " + max + " \nWind: " + vento + "\n\n";
                     dati.push(string);
                     j++;
                     primo == false;
                 }
                 else if (d != oggi && j % 8 != 0) {
-                    var string = "At: " + hour + "\nGeneral info: " + generale + " \nDetails: " + descrizione + "\n\n";
+                    var string = "At: " + hour + "\nGeneral info: " + generale + " \nDetails: " + descrizione + "\n Minimum temperature: " + min + "\n Maximum temperature: " + max + " \nWind: " + vento + "\n\n"; var string = "At: " + hour + "\nGeneral info: " + generale + " \nDetails: " + descrizione + "\n\n";
                     dati.push(string);
                     j++;
                 }
             }
+            fs.writeFileSync("nexttomorrow.json", dati);
             bot.sendMessage(chat_id, dati.join("\n"));
         });
     }).on('error', (error) => {
