@@ -19,7 +19,6 @@ bot.onText(/\/start/, (msg) => {
             inline_keyboard: [
                 [{ text: "Lista Comandi", callback_data: "1" }],
                 [{ text: "Info bot", callback_data: "2" }],
-                [{ text: "Documentazione", callback_data: "3" }]
             ]
         })
 
@@ -39,10 +38,6 @@ bot.onText(/\/start/, (msg) => {
         }
         if (action === '2') {
             text = "MeteoRio_bot, bot creato da Rio Alex per progetto di fine anno di TPSIT e GPOI";
-        }
-        if (action === '3') {
-            text ="Recupero Documentazione...";
-            bot.sendDocument(msg.chat.id, "https://drive.google.com/file/d/1PaX_9CaCfgmyd0aQEjWkAGs-c-j5DSIb/view?usp=sharing");
         }
         bot.sendMessage(msg.chat.id, text, opts);
     });
