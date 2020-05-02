@@ -122,12 +122,15 @@ bot.onText(/\/dopodomani (.+)/, (msg, match) => {
             let obj = JSON.parse(output);
             var dati = [];
             var dopodomani = calcolaDopoDomani();
+            dopodomani = parseInt(dopodomani, 10);
             for (var i = 0; i < 40; i++) {
                 var generale = obj.list[i].weather[0].main;
                 var descrizione = obj.list[i].weather[0].description;
-                var data_oggi = obj.list[0].dt_txt;
-                var hour = data_oggi.substr(11, 5);
-                if (data_oggi[8] == dopodomani[0] && data_oggi[9] == dopodomani[1]) {
+                var date =  obj.list[i].dt_txt;
+                var hour = date.substr(11, 5);
+                var day = date.substr(8, 2);
+                day = parseInt(day, 10);
+                if (dopodomani == day) {
 
                     var string = "At: " + hour + "\nGeneral info: " + generale + " \nDetails: " + descrizione + "\n\n";
                     dati.push(string);
